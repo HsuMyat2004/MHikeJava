@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kmd.uog.mhike.adapter.HikeAdapter;
@@ -25,7 +27,9 @@ public class HikeListActivity extends AppCompatActivity {
     private HikeAdapter hikeAdapter;
     private RecyclerView recyclerView;
 
+    public static final int UPDATE_REQUEST =1;
 
+    public static final int SEARCH_REQUEST=2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +64,7 @@ public class HikeListActivity extends AppCompatActivity {
                         new AlertDialog.Builder(getBaseContext()).setTitle("Error").setMessage("Can't delete this hike").show();
                     }else {
                         // extract the data again from database
-                        search();
+                        search("");
                     }
                 }
             }
@@ -71,24 +75,44 @@ public class HikeListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getBaseContext(), HikeEntryActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, UPDATE_REQUEST);
             }
         });
 
+        search("");
+
+            EditText txtSearch= findViewById(R.id.txtSearch);
+            Button btnSearch= findViewById(R.id.btnSearch);
+            Button btnAdvancedSearch= findViewById(R.id.btnAdvancedSearch);
+            btnSearch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    search(txtSearch.getText().toString());
+                }
+            });
+            btnAdvancedSearch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent= new Intent(getBaseContext(),HikeAdvancedSearchActivity.class);
+                    startActivityForResult(intent, SEARCH_REQUEST);
+                }
+            });
     }
+
+
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        search();
+        search("");
     }
 
-    private void search(){
+    private void search(String keyword){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    hikeList = databaseHelper.searchHike("");
+                    hikeList = databaseHelper.searchHike(keyword);
                     hikeAdapter.setHikeList(hikeList);
                     hikeAdapter.notifyDataSetChanged();
 
@@ -116,7 +140,36 @@ public class HikeListActivity extends AppCompatActivity {
         intent.putExtra(Hike.DESCRIPTION, hike.getDescription());
         intent.putExtra(Hike.ADDITIONAL1, hike.getAdditional1());
         intent.putExtra(Hike.ADDITIONAL2, hike.getAdditional2());
-        startActivity(intent);
+        startActivityForResult(intent, UPDATE_REQUEST);
 
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if ( requestCode== UPDATE_REQUEST && resultCode== RESULT_OK)
+        {
+            search("");
+        }else if (requestCode==SEARCH_REQUEST && resultCode==RESULT_OK)
+        {
+            String name= data.getStringExtra(Hike.NAME);
+            String location= data.getStringExtra(Hike.LOCATION);
+            String date= data.getStringExtra(Hike.DATE);
+            String length= data.getStringExtra(Hike.LENGTH);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        hikeList = databaseHelper.searchHike(name,location,date,(length!=null && !length.isEmpty()? Double.parseDouble(length):null));
+                        hikeAdapter.setHikeList(hikeList);
+                        hikeAdapter.notifyDataSetChanged(); //refresh the data
+
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
