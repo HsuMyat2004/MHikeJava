@@ -1,5 +1,6 @@
 package com.kmd.uog.mhike;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -32,7 +33,9 @@ public class HikeEntryActivity extends AppCompatActivity {
     private int locationIndex=0;
     private int difficultyIndex=0;
 
-    private String[] locations= { "PaAnn","Chinn","Mount Popa","KakaBoyarzi"};
+    public static final int UPDATE_REQUEST =1;
+
+    public static final String[] locations= { "PaAnn","Chinn","Mount Popa","KakaBoyarzi"};
     private String[] difficulty = {"Low","Medium","Height" };
 
     String location, diff;
@@ -152,7 +155,7 @@ public class HikeEntryActivity extends AppCompatActivity {
         intent.putExtra(Hike.DESCRIPTION, description);
         intent.putExtra(Hike.ADDITIONAL1, additional1);
         intent.putExtra(Hike.ADDITIONAL2, additional2);
-        startActivity(intent);
+        startActivityForResult(intent, UPDATE_REQUEST);
 
     }
 
@@ -214,4 +217,14 @@ public class HikeEntryActivity extends AppCompatActivity {
         }// END OF IF
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if ( requestCode== UPDATE_REQUEST && resultCode== RESULT_OK)
+        {
+            Intent intent= new Intent();
+            setResult(RESULT_OK,intent);
+            finish();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }
