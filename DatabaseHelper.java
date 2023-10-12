@@ -110,11 +110,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = null;
         String query ="SELECT * FROM " + TABLE_HIKE
                 +" WHERE "
-                + Hike.NAME +"='" + name + "'"
-                + " AND " + Hike.LOCATION +"='" + location + "'";
+                + Hike.NAME +" LIKE '" + name + "%'"
+                + " AND " + Hike.LOCATION +" LIKE '" + location + "%'";
 
         if( date !=null && !date.trim().isEmpty() )
-            query += " AND " + Hike.DATE + "='" + date + "'";
+            query += " AND " + Hike.DATE + " LIKE '" + date + "%'";
         if( length !=null )
             query += " AND " + Hike.LENGTH + "=" + length;
 
