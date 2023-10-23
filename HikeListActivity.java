@@ -47,7 +47,7 @@ public class HikeListActivity extends AppCompatActivity {
                 if (id==R.id.btnDetail )
                 {
                     //TODO goto hike detail and observation entry
-
+                    gotoDetailView(hike);
                 }else if ( id== R.id.btnEdit)
                 {
                     //TODO pass data to HikeEntryActivity
@@ -130,6 +130,22 @@ public class HikeListActivity extends AppCompatActivity {
     private void gotoEntry(Hike hike)
     {
         Intent intent = new Intent(this,HikeEntryActivity.class);
+        fillIntentData(intent, hike);
+        startActivityForResult(intent, UPDATE_REQUEST);
+
+    }
+
+
+    private void gotoDetailView(Hike hike)
+    {
+        Intent intent = new Intent(this,HikeDetailViewActivity.class);
+        fillIntentData(intent, hike);
+        startActivity(intent);
+
+    }
+
+    private void fillIntentData(Intent intent, Hike hike)
+    {
         intent.putExtra(Hike.ID, hike.getId());
         intent.putExtra(Hike.NAME, hike.getName());
         intent.putExtra(Hike.LOCATION, hike.getLocation());
@@ -140,10 +156,7 @@ public class HikeListActivity extends AppCompatActivity {
         intent.putExtra(Hike.DESCRIPTION, hike.getDescription());
         intent.putExtra(Hike.ADDITIONAL1, hike.getAdditional1());
         intent.putExtra(Hike.ADDITIONAL2, hike.getAdditional2());
-        startActivityForResult(intent, UPDATE_REQUEST);
-
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
