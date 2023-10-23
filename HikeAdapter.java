@@ -83,4 +83,3 @@ public class HikeAdapter extends RecyclerView.Adapter<HikeAdapter.ViewHolder>{
         }
     }
 }
-
